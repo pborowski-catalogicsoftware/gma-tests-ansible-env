@@ -1,0 +1,27 @@
+- name: Download, Unpack and Install GMA on Linux
+  hosts: linux
+  - name: GMA download, unpack and install
+  vars:
+    download_destination: "/tmp"
+    gma_archive_filename: "{{ gma_url.split('/') | last }}"
+    gma_archive_dst_path: "{{ download_destination }}/{{ gma_archive_filename }}"
+  block:
+    - name: Download GMA archive
+      get_url:
+        url: "{{ gma_url }}"
+        dest: "{{ gma_archive_dst_path }}"
+
+    - name: Unzip GMA archive
+      ansible.builtin.unarchive:
+        src: "{{ gma_archive_dst_path }}"
+        dest: "{{ download_destination }}"
+        remote_src: yes
+      register: gma_unzip
+
+    - name: Install GMA
+      ansible.builtin.command: >
+        "{{ gma_archive_dst_path[:-4] }}/install.sh"
+
+    - name: Configure GMA
+      ansible.builtin.command: >
+        "echo :)"

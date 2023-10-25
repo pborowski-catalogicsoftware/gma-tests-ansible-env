@@ -1,0 +1,15 @@
+---
+all:
+  linux:
+    hosts:
+      host1:
+      host2:
+    vars:
+  #    ansible_user: "root"
+  #    ansible_password: "password"
+      ansible_ssh_extra_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+      gma_url: "http://sth"
+  windows:
+    hosts:
+      host1:
+      host2:

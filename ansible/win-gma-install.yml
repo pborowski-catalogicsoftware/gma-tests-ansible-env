@@ -1,0 +1,30 @@
+- name: Download and Install GMA on Windows
+  hosts: windows
+  - name: GMA download, install
+  vars:
+    download_destination: 'C:'
+    gma_installer_filename: "{{ gma_url.split('/') | last }}"
+    gma_installer_path: "{{ download_destination }}\\{{ gma_installer_filename }}"
+    gma_exec_dir: 'C:\Program Files\DPX\Catalogic GuardMode Agent\Catalogic.GuardMode.Agent.exe'
+  block:
+    - name: Check if GMA is already installed  # TRIVIAL CHECK
+      ansible.windows.win_stat:
+        path: "{{ gma_exec_dir }}"
+      register: gma_exec_stat
+
+    - set_fact:
+        gma_is_installed: gma_exec_stat.stat.isreg is defined and gma_exec_stat.stat.isreg
+
+    - name: Download GMA installer
+      when: not gma_is_installed
+      ansible.windows.win_get_url:
+        url: "{{ gma_url }}"
+        dest: "{{ gma_installer_path }}"
+      register: download_gma
+
+    - name: Install GMA
+      when: not gma_is_installed
+      ansible.windows.win_shell: '{{ gma_installer_path }} --mode unattended --authorizationKey "sysadmin" --SetupDpx 1 --dpxHostname {{ dpx_master_server_ip_address }} --dpxUsername sysadmin --dpxPassword sysadmin --SetupSyslog 0'
+      args:
+        executable: cmd
+      register: gma_installation

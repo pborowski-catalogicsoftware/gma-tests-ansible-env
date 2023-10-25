@@ -1,0 +1,14 @@
+#PLACE IN /usr/lib/systemd/system/setup-hostname-and-machine-id.service
+[Unit]
+Description=Setup hostname and changes the default machine id
+Requires=local-fs.target
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/sbin/setup-hostname.sh
+ExecStart=/sbin/setup-machine-id.sh
+
+[Install]
+WantedBy=multi-user.target
